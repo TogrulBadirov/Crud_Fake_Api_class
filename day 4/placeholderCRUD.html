@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table{
+            border: 1px solid;
+        }
+        th,td{
+            border: 1px solid;
+        }
+    </style>
+</head>
+<body>
+
+    <select id="select">
+    </select>
+    <input type="text" placeholder="User Id" id="userId">
+    <input type="text" placeholder="Title" id="title">
+    <input type="text" placeholder="Body" id="body">
+
+    <table>
+        <thead>
+            <th>companyName</th>
+            <th>contactName</th>
+            <th>Adres</th>
+        </thead>
+        <tbody id="tbody">
+
+        </tbody>
+    </table>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    <script>
+        const baseUrl = 'https://northwind.vercel.app/api/suppliers'
+        
+        const select = document.getElementById('select')
+        const tbody = document.getElementById('tbody')
+
+
+        select.addEventListener('change',()=>{
+            console.log(select.value);
+            async function fetchData(params) {
+                const response = await axios.get(`${baseUrl}/${select.value}`)
+               tbody.innerHTML = `<tr>
+                <td>${response.data.companyName}</td>
+                <td>${response.data.contactName}</td>
+                    <td>
+
+                    Street: ${response.data.address.street}
+                    city: ${response.data.address.city}
+                    region: ${response.data.address.region}
+                    postalCode: ${response.data.address.postalCode}
+                    country: ${response.data.address.country}
+                    phone: ${response.data.address.phone}
+                    
+                    </td>
+                </tr>`
+            }
+            fetchData()
+        })
+
+
+
+        async function fetchDataUser() {
+            const data = await axios.get(baseUrl);
+            data.data.forEach(element => {
+                let user = `<option value="${element.id}">${element.contactTitle}</option>`
+                select.innerHTML += user
+            });
+        }
+
+        fetchDataUser()
+
+    </script>
+</body>
+</html>

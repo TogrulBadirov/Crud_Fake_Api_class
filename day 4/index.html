@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    table{
+        border: 1px solid;
+    }
+    th,td{
+        border: 1px solid;
+
+    }
+</style>
+<body>
+    
+    <input type="text" id="desc-input" placeholder="desc">
+    <input type="text" id="name-input" placeholder="name">
+    <button onclick="createPost()">Create</button>
+    <button onclick="updatePost()">Update</button>
+    <table>
+        <thead>
+            <tr>
+            <th>Id</th>
+            <th>Des</th>
+            <th>Name</th>
+        </tr>
+        </thead>
+        <tbody id="data-table">
+
+        </tbody>
+    </table>
+
+   
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    <script>
+
+        const baseUrl = 'https://northwind.vercel.app/api/categories';
+        const dataTable = document.getElementById('data-table')
+
+        async function fetchData(params) {
+            try {
+                const res = await axios.get(baseUrl)
+                adTable(res.data)
+            } catch (error) {
+                
+            }
+        }
+
+        function adTable(data) {
+            dataTable.innerHTML = ''
+            data.forEach(element => {
+                const row = document.createElement('tr')
+                row.innerHTML =`
+                                <td>${element.id} </td>
+                                <td>${element.description} </td>
+                                <td> ${element.name}</td>
+                                <button onclick="editPost(${element.id})">Edit</button>
+                                <button onclick="deletePost(${element.id})">delte</button>
+                                `
+                dataTable.append(row)
+            });
+        }
+
+
+       async function createPost() {
+            const desc = document.getElementById('desc-input')
+            const namee = document.getElementById('name-input')
+            try {
+              
+                
+               await  axios.post(baseUrl,{
+                    description:desc.value,
+                    name:namee.value
+                })
+
+                fetchData()
+                desc.value = ''
+                namee.value = ''
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+
+        async function deletePost(id) {
+            try {
+               await axios.delete(`${baseUrl}/${id}`)
+            } catch (error) {
+                console.log(error);
+            }
+            fetchData()
+        }
+
+        editPostId = null;
+
+       async function editPost(id) {
+            const descr = document.getElementById('desc-input')
+            const nameee = document.getElementById('name-input')
+            const data = await axios.get(`${baseUrl}/${id}`)
+            descr.value = data.data.description;
+            nameee.value = data.data.name;
+            editPostId = id
+        }
+
+      async  function updatePost(params) {
+            const describ = document.getElementById('desc-input')
+            const nam = document.getElementById('name-input')
+            if (editPostId) {
+                await axios.put(`${baseUrl}/${editPostId}`,{
+                    description:describ.value,
+                    name:nam.value
+                })
+                fetchData()
+            }
+        }
+
+        function refreshTable(params) {
+          setInterval(() => {
+            fetchData()
+          }, 1000);
+        }
+        
+        refreshTable()
+
+        fetchData()
+
+
+
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table{
+            border: 1px solid;
+            
+        }
+        th,td{
+                border: 1px solid;
+            }
+    </style>
+</head>
+<body>
+    
+    <input type="text" id="input">
+    <button  id="show">Show</button>
+    <button  id="create">Create</button>
+    <button id="remove">Remove</button>
+    <button id="update">Update</button>
+
+    <table>
+        <thead>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Name</th>
+        </thead>
+        <tbody id="tbody">
+
+        </tbody>
+    </table>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    <script>
+        const baseUrl = 'http://localhost:3000/posts' 
+        const tbody = document.getElementById('tbody')
+        const input = document.getElementById('input')
+        const showw = document.getElementById('show')
+        const createe = document.getElementById('create')
+        const removee = document.getElementById('remove')
+        const updatee = document.getElementById('update')
+        const buttons = document.querySelector('button')
+
+        // buttons.forEach(element => {
+        //     element.addEventListener('click',()=>{
+
+        //     })
+        // });
+        updatee.addEventListener('click',()=>{
+            updatePost(input.value)
+        })
+        removee.addEventListener('click',()=>{
+            deletePost(input.value)
+        })
+
+        createe.addEventListener('click',()=>{
+            create()
+        })
+
+        showw.addEventListener('click',()=>{
+            getdata()
+        })
+
+        async function getdata() {
+            const resp = await axios.get(baseUrl)
+            console.log(resp);
+            tbody.innerHTML = ''
+            console.log(resp.data);
+            resp.data.forEach(element => {
+                tbody.innerHTML += `
+                <tr>
+                    <td>${element.id}</td>
+                    <td>${element.title}</td>
+                    <td>${element.author}</td>
+                    <button data='${element.id}'>edit</button>
+                    <button data='${element.id}' id='remove'>remove</button>
+                </tr>
+                `
+            });
+        }
+
+        
+        async function create() {
+            const resp = await axios.post(baseUrl,{
+                title:input.value,
+                author:'typicode'
+            })
+            console.log(resp.data);
+        }
+
+        async function deletePost(id) {
+            await axios.delete(`${baseUrl}/${id}`)
+            getdata()
+        }
+        async function updatePost(id) {
+            await axios.put(`${baseUrl}/${id}`,{
+                title:'updated',
+                author:'typicode'
+            })
+            getdata()
+        }
+    </script>
+</body>
+</html>
